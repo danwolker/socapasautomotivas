@@ -1,62 +1,40 @@
 // assets/js/includes.js
-// Carrega partials em qualquer ambiente:
-// - Local (http://localhost:5500/)
-// - GitHub Pages (https://danwolker.github.io/socapasautomotivas/)
 
-function getBasePath() {
-  // Se você quiser forçar via <meta name="app-base" content="/socapasautomotivas/">
+export function getBasePath() {
   const meta = document.querySelector('meta[name="app-base"]');
   if (meta?.content) return meta.content.replace(/\/+$/, '') + '/';
 
-  // Detecta automaticamente quando estiver no GitHub Pages
-  const path = window.location.pathname; // ex: /socapasautomotivas/pages/products.html
-  const parts = path.split('/').filter(Boolean);
+  const { hostname, pathname } = window.location;
 
-  // Se estiver em github.io, o primeiro segmento geralmente é o nome do repo
-  // /socapasautomotivas/...
-  if (window.location.hostname.endsWith('github.io') && parts.length > 0) {
-    return `/${parts[0]}/`;
+  if (hostname.endsWith('github.io')) {
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length > 0) return `/${parts[0]}/`; // "/socapasautomotivas/"
   }
 
-  // Ambiente “raiz” (local / servidor normal)
   return '/';
 }
 
-const BASE = getBasePath();
+export function withBase(path) {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path)) return path;
 
-function normalizeIncludePath(p) {
-  // Aceita:
-  // /components/x.html   -> BASE + components/x.html
-  // components/x.html    -> BASE + components/x.html
-  // ./components/x.html  -> BASE + components/x.html
-  // ../components/x.html -> resolve relativo pela URL atual (mantém funcionando)
-  if (!p) return p;
+  const BASE = getBasePath();
 
-  // se já for URL absoluta (http/https), não mexe
-  if (/^https?:\/\//i.test(p)) return p;
+  if (path.startsWith('/')) return BASE + path.replace(/^\/+/, '');
+  if (path.startsWith('./')) return BASE + path.replace(/^\.\//, '');
 
-  // se começar com "/", remove e cola no BASE
-  if (p.startsWith('/')) return BASE + p.replace(/^\/+/, '');
+  if (!path.startsWith('../')) return BASE + path.replace(/^\/+/, '');
 
-  // se começar com "./", remove e cola no BASE
-  if (p.startsWith('./')) return BASE + p.replace(/^\.\//, '');
-
-  // se for relativo simples "components/x.html"
-  if (!p.startsWith('../')) return BASE + p.replace(/^\/+/, '');
-
-  // ../ mantém relativo normal
-  return p;
+  return path;
 }
 
 async function loadPartial(el, url) {
-  const finalUrl = normalizeIncludePath(url);
+  const finalUrl = withBase(url);
 
   try {
     const res = await fetch(finalUrl, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const html = await res.text();
-    el.innerHTML = html;
+    el.innerHTML = await res.text();
     el.removeAttribute('data-include');
   } catch (err) {
     console.error(`Erro ao carregar componente: ${url}`, err);
@@ -66,9 +44,28 @@ async function loadPartial(el, url) {
   }
 }
 
+function fixLinksToBase(root = document) {
+  const BASE = getBasePath();
+
+  // Reescreve links que começam com "/" para respeitar o repo do Pages
+  root.querySelectorAll('a[href^="/"]').forEach((a) => {
+    const href = a.getAttribute('href') || '/';
+    if (href.startsWith(BASE)) return; // já está ok
+    a.setAttribute('href', withBase(href));
+  });
+
+  // Reescreve imagens absolutas também (se você usar "/assets/img/...")
+  root.querySelectorAll('img[src^="/"]').forEach((img) => {
+    const src = img.getAttribute('src') || '/';
+    if (src.startsWith(BASE)) return;
+    img.setAttribute('src', withBase(src));
+  });
+}
+
 export async function includePartials() {
   const nodes = Array.from(document.querySelectorAll('[data-include]'));
-  await Promise.all(
-    nodes.map((el) => loadPartial(el, el.getAttribute('data-include')))
-  );
+  await Promise.all(nodes.map((el) => loadPartial(el, el.getAttribute('data-include'))));
+
+  // Depois de injetar HTML, corrige os href/src absolutos
+  fixLinksToBase(document);
 }

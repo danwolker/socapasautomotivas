@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SoCapas — Capa Tradicional</title>
 
+  <!-- (opcional, mas recomendado) força base no Pages -->
+  <meta name="app-base" content="/socapasautomotivas/">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../assets/css/styles.css" rel="stylesheet">
 </head>
 
 <body>
-  <div data-include="./components/navbar.html"></div>
+  <!-- sempre com /components... -->
+  <div data-include="/components/navbar.html"></div>
 
   <main class="products-page">
     <header class="products-hero">
@@ -28,8 +32,10 @@
       <div class="container">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
           <div class="small-muted" data-products-info>Carregando...</div>
+
           <div class="d-flex align-items-center gap-2">
-            <a class="btn btn-gold px-3" href="./pages/cart.html">Ver carrinho</a>
+            <!-- estamos dentro de /pages/, então cart.html é "cart.html" ou "./cart.html" -->
+            <a class="btn btn-gold px-3" href="./cart.html">Ver carrinho</a>
           </div>
         </div>
 
@@ -43,6 +49,7 @@
               <div class="skeleton skeleton-line w-90"></div>
             </div>
           </div>
+
           <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
             <div class="card-dark p-4">
               <div class="skeleton skeleton-media mb-3"></div>
@@ -52,6 +59,7 @@
               <div class="skeleton skeleton-line w-90"></div>
             </div>
           </div>
+
           <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
             <div class="card-dark p-4">
               <div class="skeleton skeleton-media mb-3"></div>
@@ -61,6 +69,7 @@
               <div class="skeleton skeleton-line w-90"></div>
             </div>
           </div>
+
           <div class="col-12 col-sm-6 col-lg-4 col-xl-3 d-none d-xl-block">
             <div class="card-dark p-4">
               <div class="skeleton skeleton-media mb-3"></div>
@@ -83,12 +92,13 @@
     </section>
   </main>
 
-  <div data-include="./components/footer.html"></div>
+  <!-- sempre com /components... -->
+  <div data-include="/components/footer.html"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="module">
-    import { includePartials } from "../assets/js/includes.js";
+    import { includePartials, withBase } from "../assets/js/includes.js";
     import { bootstrapCartUI } from "../assets/js/cart.js";
     import { initCatalogPage } from "../assets/js/catalog/page-catalog.js";
 
@@ -96,7 +106,10 @@
     bootstrapCartUI();
 
     initCatalogPage({
-      jsonPath: "/assets/data/tradicional.json",
+      // aqui está o ponto crítico:
+      // em vez de "/assets/data/tradicional.json" (quebra no Pages),
+      // usamos withBase(...)
+      jsonPath: withBase("/assets/data/tradicional.json"),
       activeNavKey: "tradicional"
     });
   </script>
