@@ -40,7 +40,7 @@ function setActivePill(cat) {
 
   // Se não tem cat, marca "Todos"
   if (!cat) {
-    const all = [...pills].find((a) => a.getAttribute("href") === "/pages/products.html");
+    const all = [...pills].find((a) => a.getAttribute("href") === "./pages/products.html");
     if (all) all.classList.add("is-active");
     return;
   }
@@ -105,7 +105,7 @@ function cardHTML(line, c, brl) {
           <div class="d-grid gap-2">
             <a
               class="btn btn-ghost"
-              href="/pages/product.html?linha=${encodeURIComponent(line)}&categoria=${encodeURIComponent(c.id)}"
+              href="./pages/product.html?linha=${encodeURIComponent(line)}&categoria=${encodeURIComponent(c.id)}"
             >
               Ver detalhes
             </a>
