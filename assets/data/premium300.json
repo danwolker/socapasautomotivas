@@ -1,0 +1,19 @@
+{
+  "line": "premium300",
+  "title": "CAPA PREMIUM 300",
+  "kicker": "Acabamento elevado",
+  "subtitle": "Tecido reforçado e sensação premium: presença visual, toque superior e caimento impecável.",
+  "categories": [
+    { "id": "hatch", "name": "Capa Premium 300 — Hatch", "desc": "Acabamento reforçado com toque premium e caimento mais firme.", "fromPrice": 449.9, "tag": "Premium", "image": "/assets/img/products/premium300-hatch.jpg" },
+    { "id": "sedan", "name": "Capa Premium 300 — Sedan", "desc": "Cobertura completa com estrutura reforçada e visual mais sofisticado.", "fromPrice": 489.9, "tag": "Proteção", "image": "/assets/img/products/premium300-sedan.jpg" },
+    { "id": "suv", "name": "Capa Premium 300 — SUV", "desc": "Pensada para porte maior, mantendo acabamento premium e estabilidade.", "fromPrice": 529.9, "tag": "Versátil", "image": "/assets/img/products/premium300-suv.jpg" },
+    { "id": "picapes-longos", "name": "Capa Premium 300 — Picapes/Longos", "desc": "Modelo reforçado para comprimento maior com ajuste consistente.", "fromPrice": 589.9, "tag": "Reforçada", "image": "/assets/img/products/premium300-picapes-longos.jpg" },
+    { "id": "picapes-grandes", "name": "Capa Premium 300 — Picapes Grandes", "desc": "Para dimensões maiores com padrão premium e caimento firme.", "fromPrice": 649.9, "tag": "Premium", "image": "/assets/img/products/premium300-picapes-grandes.jpg" },
+    { "id": "showroom-eventos", "name": "Capa Premium 300 — Showroom/Eventos", "desc": "Visual premium para apresentação: foco em estética e acabamento.", "fromPrice": 699.9, "tag": "Exposição", "image": "/assets/img/products/premium300-showroom.jpg" },
+    { "id": "universal", "name": "Premium 300 — Universal (Hatch até SUV)", "desc": "Opção prática com sensação premium e ajuste inteligente.", "fromPrice": 399.9, "tag": "Universal", "image": "/assets/img/products/premium300-universal.jpg" },
+    { "id": "motos", "name": "Premium 300 — Motos", "desc": "Proteção reforçada e prática, com acabamento acima do básico.", "fromPrice": 249.9, "tag": "Compacta", "image": "/assets/img/products/premium300-motos.jpg" },
+    { "id": "quadriciclos", "name": "Premium 300 — Quadriciclos", "desc": "Cobertura reforçada para uso externo e proteção prolongada.", "fromPrice": 399.9, "tag": "Off-road", "image": "/assets/img/products/premium300-quadriciclos.jpg" },
+    { "id": "jetskis", "name": "Premium 300 — Jet Skis", "desc": "Proteção premium para armazenamento e transporte, com acabamento firme.", "fromPrice": 429.9, "tag": "Náutico", "image": "/assets/img/products/premium300-jetskis.jpg" },
+    { "id": "super-personalizada", "name": "Premium 300 — Super Personalizada", "desc": "Personalização avançada com acabamento premium e detalhes sob demanda.", "fromPrice": 899.9, "tag": "Personalizada", "image": "/assets/img/products/premium300-super.jpg" }
+  ]
+}
