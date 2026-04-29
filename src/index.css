@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-0: #0b0f14;
+  --color-bg-1: #0e141c;
+  --color-bg-2: #121a24;
+  --color-gold: #d2a84f;
+  --color-gold-2: #f0c35a;
+  --color-text-main: #e9eef6;
+  --color-muted: rgba(233,238,246, 0.72);
+  --color-muted-2: rgba(233,238,246, 0.56);
+  --color-panel: rgba(255, 255, 255, 0.04);
+  --color-panel-2: rgba(255, 255, 255, 0.06);
+  --color-stroke: rgba(255, 255, 255, 0.08);
+  --color-stroke-2: rgba(255, 255, 255, 0.12);
+
+  /* Tornando o design mais técnico e menos "redondo" */
+  --radius-panel: 4px;
+  --radius-panel-2: 8px;
+
+  --shadow-premium: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+@layer base {
+  html, body {
+    height: 100%;
+    @apply bg-bg-0 text-text-main;
+    /* Fonte mais técnica e legível */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    position: relative;
+    isolation: isolate;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 0%, #161d27 0%, #0b0f14 100%);
+  }
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-gradient-to-r from-gold to-gold-2 border-0 text-[#131313] font-black uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98] rounded-[4px] px-8 py-4 shadow-[0_4px_15px_rgba(210,168,79,0.2)];
+  }
+
+  .btn-ghost {
+    @apply bg-transparent border border-white/20 text-white font-black uppercase tracking-widest transition-all hover:bg-white hover:text-bg-0 rounded-[4px] px-8 py-4;
+  }
+
+  .panel {
+    @apply bg-white/[0.03] border border-white/10 rounded-[8px] shadow-premium backdrop-blur-md;
+  }
+
+  .card-dark {
+    @apply bg-white/[0.02] border border-white/10 rounded-[4px] shadow-lg transition-all hover:border-gold/40 hover:bg-white/[0.04];
+  }
+
+  .glass-card {
+    @apply bg-white/[0.04] border border-white/10 backdrop-blur-md;
+  }
+}
