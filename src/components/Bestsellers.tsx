@@ -4,6 +4,11 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
+import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
+import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
+import suvImg from '../assets/capas/Capa para SUVs.png';
+import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
+
 const Bestsellers: React.FC = () => {
   const { addToCart } = useCart();
 
@@ -14,6 +19,7 @@ const Bestsellers: React.FC = () => {
       price: 395.90,
       badge: 'Custo Benefício',
       desc: 'Proteção sob medida para uso diário.',
+      image: hatchImg,
     },
     {
       id: 'premium300',
@@ -21,6 +27,7 @@ const Bestsellers: React.FC = () => {
       price: 630.00,
       badge: 'Mais Vendido',
       desc: 'Robustez e ventilação estruturada.',
+      image: suvImg,
     },
     {
       id: 'peluciada',
@@ -28,6 +35,7 @@ const Bestsellers: React.FC = () => {
       price: 630.00,
       badge: 'Top de Linha',
       desc: 'Interior aveludado para máxima proteção.',
+      image: premiumPeluciadaImg,
     },
   ];
 
@@ -63,10 +71,18 @@ const Bestsellers: React.FC = () => {
                 <Star className="w-4 h-4 text-gold fill-gold" />
               </div>
               
-              <div className="aspect-video bg-white/[0.02] border border-white/5 mb-8 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.04] transition-colors">
-                <div className="text-white/[0.03] font-black text-4xl select-none uppercase tracking-tighter">
-                  Pelé das Capas
+              <div className="aspect-square bg-white/[0.02] border border-white/5 mb-8 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.04] transition-colors">
+                {/* Glow de fundo */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-20 group-hover:opacity-40 transition-opacity">
+                  <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[60px]"></div>
                 </div>
+
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  className="w-full h-full object-contain p-6 relative z-10 drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-700"
+                />
+                
                 <div className="absolute inset-0 bg-gradient-to-tr from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
 

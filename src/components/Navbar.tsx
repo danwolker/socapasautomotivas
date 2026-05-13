@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import logoImg from '../assets/Pelé das capas Logo (1).svg';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,11 +32,11 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-white/15 to-white/5 border border-white/15 shadow-2xl flex items-center justify-center transition-transform group-hover:scale-105">
-               <div className="w-5 h-5 bg-gold blur-[8px] opacity-40 absolute"></div>
-               <div className="w-3 h-3 bg-gold relative z-10"></div>
-            </div>
-            <span className="text-xl font-black tracking-tight text-white uppercase">Pelé das Capas</span>
+            <img 
+              src={logoImg} 
+              alt="Pelé das Capas" 
+              className="h-10 w-auto transition-transform group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Nav */}

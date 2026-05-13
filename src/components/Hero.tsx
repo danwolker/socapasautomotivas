@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import logoImg from '../assets/Pelé das capas Logo (1).svg';
 
 const Hero: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -48,8 +49,8 @@ const Hero: React.FC = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="text-[10px] font-black text-gold tracking-[0.6em] uppercase mb-12">
-            Pelé das Capas
+          <div className="flex justify-center mb-12">
+            <img src={logoImg} alt="Pelé das Capas" className="h-16 md:h-20 w-auto opacity-90" />
           </div>
           
           <div className="relative h-[250px] md:h-[300px]">

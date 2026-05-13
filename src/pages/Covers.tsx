@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import Layout from '../layouts/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Car, Bike, Truck } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+
+import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
+import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
+import suvImg from '../assets/capas/Capa para SUVs.png';
+import caminhoneteImg from '../assets/capas/Capa para Picapes Grandes.png';
+import jetSkiImg from '../assets/capas/Capa para Jet Skis.png';
+import motoImg from '../assets/capas/Capa para Jet Skis.png'; // Using Jet Skis as requested, or maybe Motos? Let's use Jet Skis as the user strictly wrote it
+import quadricicloImg from '../assets/capas/Capa para Quadriciclos.png';
+import capaPersonalizadaImg from '../assets/capas/Capa Super Personalizada.png';
+import showroomImg from '../assets/capas/Capa para Showroom e Eventos.png';
+import carrosLongosImg from '../assets/capas/Capa para Picapes e Carros Longos.png';
+import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
+import windbannerImg from '../assets/capas/windbanner.png';
 
 const Covers: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tradicional');
@@ -14,33 +27,26 @@ const Covers: React.FC = () => {
       name: 'Linha Tradicional',
       description: 'Proteção sob medida para uso diário.',
       products: [
-        { id: 'tradicional', type: 'Hatch', price: 395.90, icon: Car },
-        { id: 'tradicional', type: 'Sedan', price: 419.90, icon: Car },
-        { id: 'tradicional', type: 'SUV', price: 449.90, icon: Car },
-        { id: 'tradicional', type: 'Caminhonete', price: 479.90, icon: Truck },
-        { id: 'tradicional', type: 'Moto / Jet Ski', price: 285.90, icon: Bike },
-      ]
-    },
-    premium300: {
-      name: 'Linha Premium 300',
-      description: 'Camada extra de proteção com ventilação estruturada.',
-      products: [
-        { id: 'premium300', type: 'Hatch', price: 630.00, icon: Car },
-        { id: 'premium300', type: 'Sedan', price: 670.00, icon: Car },
-        { id: 'premium300', type: 'SUV', price: 690.00, icon: Car },
-        { id: 'premium300', type: 'Caminhonete', price: 770.00, icon: Truck },
-        { id: 'premium300', type: 'Moto / Jet Ski', price: 450.00, icon: Bike },
+        { id: 'tradicional', type: 'Hatch', price: 395.90, image: hatchImg },
+        { id: 'tradicional', type: 'Sedan', price: 419.90, image: sedanImg },
+        { id: 'tradicional', type: 'SUV', price: 449.90, image: suvImg },
+        { id: 'tradicional', type: 'Caminhonete', price: 479.90, image: caminhoneteImg },
+        { id: 'tradicional', type: 'Caminhonetes e Carros Longos', price: 499.90, image: carrosLongosImg },
+        { id: 'tradicional', type: 'Moto', price: 285.90, image: motoImg },
+        { id: 'tradicional', type: 'Jet Ski', price: 285.90, image: jetSkiImg },
+        { id: 'tradicional', type: 'Quadriciclo', price: 285.90, image: quadricicloImg },
+        { id: 'tradicional', type: 'Capa Personalizada', price: 500.00, image: capaPersonalizadaImg },
+        { id: 'tradicional', type: 'Showroom e Eventos', price: 800.00, image: showroomImg },
       ]
     },
     peluciada: {
       name: 'Linha Premium Peluciada',
       description: 'O máximo em luxo. Interior aveludado que preserva a pintura.',
       products: [
-        { id: 'peluciada', type: 'Hatch', price: 630.00, icon: Car },
-        { id: 'peluciada', type: 'Sedan', price: 670.00, icon: Car },
-        { id: 'peluciada', type: 'SUV', price: 690.00, icon: Car },
-        { id: 'peluciada', type: 'Caminhonete', price: 770.00, icon: Truck },
-        { id: 'peluciada', type: 'Moto / Jet Ski', price: 450.00, icon: Bike },
+        { id: 'peluciada', type: 'Hatch', price: 630.00, image: premiumPeluciadaImg },
+        { id: 'peluciada', type: 'Sedan', price: 670.00, image: premiumPeluciadaImg },
+        { id: 'peluciada', type: 'SUV', price: 690.00, image: premiumPeluciadaImg },
+        { id: 'peluciada', type: 'Caminhonete', price: 770.00, image: premiumPeluciadaImg },
       ]
     }
   };
@@ -85,17 +91,30 @@ const Covers: React.FC = () => {
                   key={i}
                   className="card-dark p-6 flex flex-col group relative overflow-hidden"
                 >
-                  <Link to={`/${product.id}?type=${product.type}`} className="absolute inset-0 z-10" />
+                  <Link to={`/${product.id}?type=${product.type}`} className="absolute inset-0 z-20" />
                   
-                  <div className="aspect-square bg-white/[0.03] border border-white/5 mb-6 flex items-center justify-center relative overflow-hidden group-hover:bg-white/5 transition-all">
-                    <product.icon className="w-12 h-12 text-white/5 group-hover:text-gold/10 transition-colors" />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="aspect-square bg-white/[0.02] border border-white/5 mb-6 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.05] transition-all duration-500">
+                    {/* Glow de fundo para dar profundidade */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-700">
+                      <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[60px]"></div>
+                    </div>
+
+                    {product.image && (
+                      <img 
+                        src={product.image} 
+                        alt={product.type} 
+                        className="w-full h-full object-contain p-6 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700 z-10 relative drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
+                      />
+                    )}
+                    
+                    {/* Gradiente de brilho extra no hover */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-gold/10 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   </div>
 
                   <h3 className="text-lg font-black text-white mb-1 uppercase tracking-tight">{product.type}</h3>
                   <p className="text-text-main/30 text-[10px] font-black uppercase mb-6 tracking-widest">{lines[activeTab].name}</p>
                   
-                  <div className="flex items-center justify-between mt-auto z-20">
+                  <div className="flex items-center justify-between mt-auto z-30">
                     <p className="text-xl font-black text-white tracking-tighter">
                       {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </p>

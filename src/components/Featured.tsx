@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
 
 const Featured: React.FC = () => {
   return (
@@ -36,13 +37,25 @@ const Featured: React.FC = () => {
             viewport={{ once: true }}
             className="lg:w-1/2 relative"
           >
-            <div className="aspect-video bg-white/[0.02] border border-white/10 flex items-center justify-center relative overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 flex items-center justify-center text-white/[0.03] font-black text-[12rem] select-none">
+            <div className="aspect-square md:aspect-video bg-white/[0.02] border border-white/10 flex items-center justify-center relative overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 flex items-center justify-center text-white/[0.03] font-black text-[12rem] select-none pointer-events-none">
                 PELÉ
               </div>
-              <div className="w-2/3 h-2/3 bg-white/[0.05] border border-white/10 shadow-2xl relative z-10 flex flex-col items-center justify-center p-8 text-center">
-                 <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-4">Material Premium</div>
-                 <div className="text-2xl font-black text-white uppercase tracking-tight">Polietileno Reforçado</div>
+              
+              {/* Glow central */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[80px]"></div>
+              </div>
+
+              <img 
+                src={sedanImg} 
+                alt="Capa Tradicional" 
+                className="w-full h-full object-contain p-12 relative z-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] hover:scale-105 transition-transform duration-700"
+              />
+              
+              <div className="absolute bottom-6 right-6 z-20 bg-black/60 backdrop-blur-md border border-white/10 p-4 hidden md:block">
+                 <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-1">Material Premium</div>
+                 <div className="text-lg font-black text-white uppercase tracking-tight">Polietileno Reforçado</div>
               </div>
             </div>
           </motion.div>
