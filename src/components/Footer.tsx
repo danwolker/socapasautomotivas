@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, MessageCircle, Shield, Lock } from 'lucide-react';
+import { MessageCircle, Shield, Lock } from 'lucide-react';
 import logoImg from '../assets/Pelé das capas Logo (1).svg';
 
 // Payment icon SVG components (inline, no external dependency)

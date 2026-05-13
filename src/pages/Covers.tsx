@@ -16,7 +16,7 @@ import capaPersonalizadaImg from '../assets/capas/Capa Super Personalizada.png';
 import showroomImg from '../assets/capas/Capa para Showroom e Eventos.png';
 import carrosLongosImg from '../assets/capas/Capa para Picapes e Carros Longos.png';
 import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
-import windbannerImg from '../assets/capas/windbanner.png';
+
 
 const Covers: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tradicional');

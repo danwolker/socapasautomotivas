@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../layouts/Layout';
 import { motion } from 'framer-motion';
-import { Check, Star, ChevronLeft, ChevronRight, ShoppingCart, Shield } from 'lucide-react';
+import { Check, Star, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useSearchParams, Link } from 'react-router-dom';
 

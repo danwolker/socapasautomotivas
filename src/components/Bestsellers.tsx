@@ -5,7 +5,6 @@ import { ShoppingCart, Star, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
-import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
 import suvImg from '../assets/capas/Capa para SUVs.png';
 import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
 
