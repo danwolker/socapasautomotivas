@@ -11,6 +11,10 @@ import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
 import suvImg from '../assets/capas/Capa para SUVs.png';
 import caminhoneteImg from '../assets/capas/Capa para Picapes Grandes.png';
 import jetSkiImg from '../assets/capas/Capa para Jet Skis.png';
+import motoImg from '../assets/capas/Capa para Motos.png';
+import quadricicloImg from '../assets/capas/Capa para Quadriciclos.png';
+import capaPersonalizadaImg from '../assets/capas/Capa Super Personalizada.png';
+import showroomImg from '../assets/capas/Capa para Showroom e Eventos.png';
 import carrosLongosImg from '../assets/capas/Capa para Picapes e Carros Longos.png';
 import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
 
