@@ -4,8 +4,8 @@
   --color-bg-0: #0b0f14;
   --color-bg-1: #0e141c;
   --color-bg-2: #121a24;
-  --color-gold: #d2a84f;
-  --color-gold-2: #f0c35a;
+  --color-gold: #ed3237;
+  --color-gold-2: #c0262b;
   --color-text-main: #e9eef6;
   --color-muted: rgba(233,238,246, 0.72);
   --color-muted-2: rgba(233,238,246, 0.56);
@@ -48,11 +48,11 @@
 
 @layer components {
   .btn-gold {
-    @apply bg-gradient-to-r from-gold to-gold-2 border-0 text-[#131313] font-black uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98] rounded-[4px] px-8 py-4 shadow-[0_4px_15px_rgba(210,168,79,0.2)];
+    @apply bg-gradient-to-r from-gold to-gold-2 border-0 text-white font-black uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98] rounded-[4px] px-8 py-4 shadow-[0_4px_15px_rgba(237,50,55,0.3)];
   }
 
   .btn-ghost {
-    @apply bg-transparent border border-white/20 text-white font-black uppercase tracking-widest transition-all hover:bg-white hover:text-bg-0 rounded-[4px] px-8 py-4;
+    @apply bg-transparent border border-white/20 text-white font-black uppercase tracking-widest transition-all hover:bg-gold hover:text-white rounded-[4px] px-8 py-4;
   }
 
   .panel {

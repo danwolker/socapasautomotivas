@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
 
+import { Link } from 'react-router-dom';
+
 const Featured: React.FC = () => {
   return (
     <section className="py-24 overflow-hidden border-t border-white/5">
@@ -25,7 +27,7 @@ const Featured: React.FC = () => {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <button className="btn-gold">Comprar Agora</button>
+              <Link to="/capas" className="btn-gold flex items-center justify-center">Comprar Agora</Link>
               <button className="btn-ghost">Especificações</button>
             </div>
           </motion.div>

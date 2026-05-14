@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface CartItem {
-  id: string;
+  id: string;            // string única para identificar o item no carrinho (slug + variation)
+  variation_id: number;  // ID numérico real da tabela product_variations (usado no checkout)
   name: string;
   price: number;
   quantity: number;
   image?: string;
+  vehicle_model_year?: string;  // modelo e ano do veículo (ex: "Toyota Corolla 2020")
+  color?: string;               // cor escolhida da capa
 }
 
 interface CartContextType {

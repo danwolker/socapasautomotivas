@@ -1,58 +1,129 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play } from 'lucide-react';
+import { Play, Volume2, VolumeX } from 'lucide-react';
+import { fetchVideos } from '../services/api';
+
+interface VideoCardProps {
+    tip: {
+        id: number;
+        title: string;
+        description: string;
+        video_path: string;
+    };
+    index: number;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isMuted, setIsMuted] = useState(true);
+
+    useEffect(() => {
+        if (videoRef.current) {
+            if (isHovered) {
+                videoRef.current.play().catch((err) => {
+                    console.warn("Playback failed:", err);
+                });
+            } else {
+                videoRef.current.pause();
+                videoRef.current.currentTime = 0;
+            }
+        }
+    }, [isHovered]);
+
+    // Construct the correct URL
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    // Ensure the URL is correctly formed and encoded
+    const videoUrl = `${baseUrl}movies/${tip.video_path}`.replace(/\/+/g, '/');
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="group relative aspect-[9/16] rounded-[32px] overflow-hidden border border-white/10 bg-white/5 cursor-pointer shadow-premium"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => setIsMuted(!isMuted)}
+        >
+            {/* Video Element */}
+            <video 
+                ref={videoRef}
+                key={videoUrl} // Force re-render if URL changes
+                className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                muted={isMuted}
+                loop
+                playsInline
+                preload="auto"
+            >
+                <source src={videoUrl} type="video/mp4" />
+                Seu navegador não suporta vídeos.
+            </video>
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10"></div>
+            
+            {/* Mute/Unmute Indicator */}
+            <div className="absolute top-6 right-6 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white">
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </div>
+            </div>
+
+            {/* Play Button Icon (visible when not hovered) */}
+            {!isHovered && (
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                    <div className="w-16 h-16 rounded-full bg-gold text-white flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
+                        <Play className="w-6 h-6 fill-current ml-1" />
+                    </div>
+                </div>
+            )}
+
+            {/* Info */}
+            <div className="absolute bottom-8 left-8 right-8 z-20">
+                <h4 className="text-white font-black text-xl uppercase tracking-tight mb-2">{tip.title}</h4>
+                <p className="text-text-main/60 text-xs font-medium leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    {tip.description}
+                </p>
+            </div>
+
+            {/* Background Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+        </motion.div>
+    );
+};
 
 const Videos: React.FC = () => {
-  const testimonials = [
-    { id: 1, title: 'Depoimento #1', duration: '0:45' },
-    { id: 2, title: 'Depoimento #2', duration: '1:12' },
-    { id: 3, title: 'Depoimento #3', duration: '0:58' },
-  ];
+  const [tips, setTips] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchVideos().then(data => {
+        setTips(data);
+        setLoading(false);
+    });
+  }, []);
+
+  if (loading) return null;
+  if (tips.length === 0) return null;
 
   return (
     <section className="py-24 bg-black/10">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between align-items-end gap-6 mb-12">
           <div>
-            <span className="text-gold font-black uppercase tracking-[0.2em] text-xs mb-4 block">Prova social</span>
-            <h2 className="text-4xl font-black text-white uppercase">O que nossos clientes dizem</h2>
-            <p className="text-text-main/50 mt-2">Depoimentos em vídeo — reais, diretos e sem roteiro.</p>
+            <span className="text-gold font-black uppercase tracking-[0.2em] text-[10px] mb-4 block">Educação e Dicas</span>
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Dicas do Pelé!</h2>
+            <p className="text-text-main/50 mt-2 max-w-2xl font-medium">
+                Confira dicas essenciais de como utilizar e cuidar das suas capas. Toque no vídeo para ativar/desativar o som.
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((video, i) => (
-            <motion.div
-              key={video.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className="group relative aspect-[9/16] md:aspect-video rounded-[32px] overflow-hidden border border-white/10 bg-white/5 cursor-pointer shadow-premium"
-            >
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-              
-              {/* Play Button */}
-              <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="w-16 h-16 rounded-full bg-gold text-[#131313] flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
-                  <Play className="w-6 h-6 fill-current ml-1" />
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="absolute bottom-8 left-8 z-20">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="px-2 py-1 rounded bg-white/10 backdrop-blur-md border border-white/10 text-[10px] font-black text-white">
-                    {video.duration}
-                  </div>
-                </div>
-                <h4 className="text-white font-black text-xl uppercase tracking-tight">{video.title}</h4>
-              </div>
-
-              {/* Background Effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            </motion.div>
+          {tips.map((tip, i) => (
+            <VideoCard key={tip.id} tip={tip} index={i} />
           ))}
         </div>
       </div>

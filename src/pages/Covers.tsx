@@ -1,55 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../layouts/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import { fetchProducts } from '../services/api';
 
+// Imports de imagens para mapeamento
 import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
 import sedanImg from '../assets/capas/Capa para Carros Sedan.png';
 import suvImg from '../assets/capas/Capa para SUVs.png';
 import caminhoneteImg from '../assets/capas/Capa para Picapes Grandes.png';
 import jetSkiImg from '../assets/capas/Capa para Jet Skis.png';
-import motoImg from '../assets/capas/Capa para Jet Skis.png'; // Using Jet Skis as requested, or maybe Motos? Let's use Jet Skis as the user strictly wrote it
+import motoImg from '../assets/capas/Capa para Motos.png'; 
 import quadricicloImg from '../assets/capas/Capa para Quadriciclos.png';
 import capaPersonalizadaImg from '../assets/capas/Capa Super Personalizada.png';
 import showroomImg from '../assets/capas/Capa para Showroom e Eventos.png';
 import carrosLongosImg from '../assets/capas/Capa para Picapes e Carros Longos.png';
 import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
 
+const imageMap: Record<string, string> = {
+  'Hatch': hatchImg,
+  'Sedan': sedanImg,
+  'SUV': suvImg,
+  'Caminhonete': caminhoneteImg,
+  'Caminhonetes e Carros Longos': carrosLongosImg,
+  'Moto': motoImg,
+  'Jet Ski': jetSkiImg,
+  'Quadriciclo': quadricicloImg,
+  'Capa Personalizada': capaPersonalizadaImg,
+  'Showroom e Eventos': showroomImg,
+  'default': premiumPeluciadaImg
+};
 
 const Covers: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('tradicional');
+  const [activeTab, setActiveTab] = useState('');
+  const [data, setData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  const lines: any = {
-    tradicional: {
-      name: 'Linha Tradicional',
-      description: 'Proteção sob medida para uso diário.',
-      products: [
-        { id: 'tradicional', type: 'Hatch', price: 395.90, image: hatchImg },
-        { id: 'tradicional', type: 'Sedan', price: 419.90, image: sedanImg },
-        { id: 'tradicional', type: 'SUV', price: 449.90, image: suvImg },
-        { id: 'tradicional', type: 'Caminhonete', price: 479.90, image: caminhoneteImg },
-        { id: 'tradicional', type: 'Caminhonetes e Carros Longos', price: 499.90, image: carrosLongosImg },
-        { id: 'tradicional', type: 'Moto', price: 285.90, image: motoImg },
-        { id: 'tradicional', type: 'Jet Ski', price: 285.90, image: jetSkiImg },
-        { id: 'tradicional', type: 'Quadriciclo', price: 285.90, image: quadricicloImg },
-        { id: 'tradicional', type: 'Capa Personalizada', price: 500.00, image: capaPersonalizadaImg },
-        { id: 'tradicional', type: 'Showroom e Eventos', price: 800.00, image: showroomImg },
-      ]
-    },
-    peluciada: {
-      name: 'Linha Premium Peluciada',
-      description: 'O máximo em luxo. Interior aveludado que preserva a pintura.',
-      products: [
-        { id: 'peluciada', type: 'Hatch', price: 630.00, image: premiumPeluciadaImg },
-        { id: 'peluciada', type: 'Sedan', price: 670.00, image: premiumPeluciadaImg },
-        { id: 'peluciada', type: 'SUV', price: 690.00, image: premiumPeluciadaImg },
-        { id: 'peluciada', type: 'Caminhonete', price: 770.00, image: premiumPeluciadaImg },
-      ]
-    }
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      const products = await fetchProducts();
+      
+      // Agrupa produtos por categoria
+      const grouped: any = {};
+      products.forEach((p: any) => {
+        // Ignorar acessórios na página de Capas
+        if (p.category_slug === 'acessorios') return;
+
+        const catSlug = p.category_slug || 'outros';
+        
+        if (!grouped[catSlug]) {
+          grouped[catSlug] = {
+            name: p.category,
+            products: []
+          };
+        }
+        
+        // Mapeia variações
+        p.variations.forEach((v: any) => {
+           grouped[catSlug].products.push({
+             id: p.slug,
+             variation_id: v.id,
+             type: v.variation_name,
+             price: parseFloat(v.price),
+             image: imageMap[v.variation_name] || imageMap['default']
+           });
+        });
+      });
+
+      setData(grouped);
+      const keys = Object.keys(grouped);
+      if (keys.length > 0) setActiveTab(keys[0]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-12 h-12 text-gold animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  const tabs = Object.keys(data);
 
   return (
     <Layout>
@@ -59,9 +98,9 @@ const Covers: React.FC = () => {
             <span className="text-gold font-black uppercase tracking-[0.2em] text-xs mb-4 block">Catálogo</span>
             <h1 className="text-5xl font-black text-white uppercase tracking-tight mb-4">Escolha sua Capa</h1>
             
-            {/* Tabs */}
+            {/* Tabs Dinâmicas */}
             <div className="flex flex-wrap justify-center gap-1 mt-12 p-1 bg-white/[0.03] border border-white/10 rounded-none max-w-fit mx-auto">
-              {Object.keys(lines).map((key) => (
+              {tabs.map((key) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
@@ -71,70 +110,70 @@ const Covers: React.FC = () => {
                       : 'text-text-main/40 hover:text-text-main hover:bg-white/5'
                   }`}
                 >
-                  {lines[key].name}
+                  {data[key].name}
                 </button>
               ))}
             </div>
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
-            >
-              {lines[activeTab].products.map((product: any, i: number) => (
-                <div
-                  key={i}
-                  className="card-dark p-6 flex flex-col group relative overflow-hidden"
-                >
-                  <Link to={`/${product.id}?type=${product.type}`} className="absolute inset-0 z-20" />
-                  
-                  <div className="aspect-square bg-white/[0.02] border border-white/5 mb-6 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.05] transition-all duration-500">
-                    {/* Glow de fundo para dar profundidade */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-700">
-                      <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[60px]"></div>
+            {activeTab && (
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+              >
+                {data[activeTab].products.map((product: any, i: number) => (
+                  <div
+                    key={i}
+                    className="card-dark p-6 flex flex-col group relative overflow-hidden"
+                  >
+                    <Link to={`/produto/${product.id}?type=${product.type}`} className="absolute inset-0 z-20" />
+                    
+                    <div className="aspect-square bg-white/[0.02] border border-white/5 mb-6 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.05] transition-all duration-500">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-700">
+                        <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[60px]"></div>
+                      </div>
+
+                      {product.image && (
+                        <img 
+                          src={product.image} 
+                          alt={product.type} 
+                          className="w-full h-full object-contain p-6 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700 z-10 relative drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
+                        />
+                      )}
                     </div>
 
-                    {product.image && (
-                      <img 
-                        src={product.image} 
-                        alt={product.type} 
-                        className="w-full h-full object-contain p-6 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700 z-10 relative drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]" 
-                      />
-                    )}
+                    <h3 className="text-lg font-black text-white mb-1 uppercase tracking-tight">{product.type}</h3>
+                    <p className="text-text-main/30 text-[10px] font-black uppercase mb-6 tracking-widest">{data[activeTab].name}</p>
                     
-                    {/* Gradiente de brilho extra no hover */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-gold/10 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div className="flex items-center justify-between mt-auto z-30">
+                      <p className="text-xl font-black text-white tracking-tighter">
+                        {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </p>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart({ 
+                            id: `cover-${product.variation_id}`,
+                            variation_id: product.variation_id,
+                            name: `${data[activeTab].name} - ${product.type}`, 
+                            price: product.price,
+                            image: product.image,
+                          });
+                        }}
+                        className="w-10 h-10 bg-gold text-[#131313] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-
-                  <h3 className="text-lg font-black text-white mb-1 uppercase tracking-tight">{product.type}</h3>
-                  <p className="text-text-main/30 text-[10px] font-black uppercase mb-6 tracking-widest">{lines[activeTab].name}</p>
-                  
-                  <div className="flex items-center justify-between mt-auto z-30">
-                    <p className="text-xl font-black text-white tracking-tighter">
-                      {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                    </p>
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToCart({ 
-                          id: `${product.id}-${product.type}`, 
-                          name: `${lines[activeTab].name} (${product.type})`, 
-                          price: product.price 
-                        });
-                      }}
-                      className="w-10 h-10 bg-gold text-[#131313] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
+                ))}
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </section>
@@ -143,3 +182,4 @@ const Covers: React.FC = () => {
 };
 
 export default Covers;
+

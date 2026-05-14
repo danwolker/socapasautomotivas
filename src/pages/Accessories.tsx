@@ -1,59 +1,60 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../layouts/Layout';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Package } from 'lucide-react';
+import { ShoppingCart, Package, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import { fetchProducts } from '../services/api';
 
 import windbannerImg from '../assets/capas/windbanner.png';
 
+const imageMap: Record<string, string> = {
+  'Windbanner': windbannerImg,
+  'default': windbannerImg
+};
+
 const Accessories: React.FC = () => {
   const { addToCart } = useCart();
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const products = [
-    {
-      id: 'windbanner-medio',
-      name: 'Windbanner Médio (2,10m)',
-      price: 179.90,
-      desc: 'Tamanho 2,10 x 0,70m. Ideal para calçadas e entradas de lojas.',
-      image: windbannerImg
-    },
-    {
-      id: 'windbanner-grande',
-      name: 'Windbanner Grande (2,60m)',
-      price: 209.90,
-      desc: 'Tamanho 2,60 x 0,70m. Maior visibilidade para sua marca.',
-      image: windbannerImg
-    },
-    {
-      id: 'windbanner-gigante',
-      name: 'Windbanner Gigante (3,00m)',
-      price: 239.90,
-      desc: 'Tamanho 3,00 x 0,70m. Destaque total para eventos e pátios.',
-      image: windbannerImg
-    },
-    {
-      id: 'windbanner-kit-3',
-      name: 'Kit 3 Windbanners (5% OFF)',
-      price: 512.71,
-      desc: 'Leve 3 unidades do tamanho médio com desconto especial.',
-      image: windbannerImg
-    },
-    {
-      id: 'windbanner-kit-5',
-      name: 'Kit 5 Windbanners (10% OFF)',
-      price: 809.55,
-      desc: 'Leve 5 unidades do tamanho médio com 10% de desconto.',
-      image: windbannerImg
-    },
-    {
-      id: 'windbanner-kit-10',
-      name: 'Kit 10 Windbanners (15% OFF)',
-      price: 1529.15,
-      desc: 'A melhor oferta! 10 unidades com 15% de desconto real.',
-      image: windbannerImg
-    },
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchProducts();
+      
+      const accessories: any[] = [];
+      data.forEach((p: any) => {
+        if (p.category_slug === 'acessorios') {
+          p.variations.forEach((v: any) => {
+            accessories.push({
+              id: `${p.slug}-${v.variation_name}`,
+              variation_id: v.id,
+              productId: p.slug,
+              name: `${p.name} - ${v.variation_name}`,
+              price: parseFloat(v.price),
+              desc: p.description || 'Acessório original Pelé das Capas.',
+              image: imageMap[v.variation_name] || imageMap['default'],
+              type: v.variation_name
+            });
+          });
+        }
+      });
+      
+      setProducts(accessories);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-12 h-12 text-gold animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -76,10 +77,9 @@ const Accessories: React.FC = () => {
                 transition={{ delay: i * 0.1 }}
                 className="card-dark p-6 flex flex-col group relative overflow-hidden"
               >
-                <Link to={product.id.startsWith('windbanner') ? '/acessorios/windbanner' : `/accessories/${product.id}`} className="absolute inset-0 z-20" />
+                <Link to={`/produto/${product.productId}?type=${product.type}`} className="absolute inset-0 z-20" />
                 
                 <div className="aspect-square bg-white/[0.02] border border-white/5 mb-6 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.05] transition-all duration-500">
-                    {/* Glow de fundo */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-700">
                       <div className="w-1/2 h-1/2 bg-gold/20 rounded-full blur-[60px]"></div>
                     </div>
@@ -98,7 +98,7 @@ const Accessories: React.FC = () => {
                 </div>
 
                 <h3 className="text-lg font-black text-white mb-2 uppercase tracking-tight">{product.name}</h3>
-                <p className="text-text-main/50 text-xs mb-6 flex-grow leading-relaxed">{product.desc}</p>
+                <p className="text-text-main/50 text-[10px] uppercase font-black mb-6 flex-grow">{product.desc}</p>
                 
                 <div className="flex items-center justify-between mt-auto z-30">
                   <p className="text-xl font-black text-white">
@@ -107,9 +107,15 @@ const Accessories: React.FC = () => {
                   <button 
                     onClick={(e) => {
                       e.preventDefault();
-                      addToCart({ id: product.id, name: product.name, price: product.price });
+                      addToCart({ 
+                        id: `acc-${product.variation_id}`,
+                        variation_id: product.variation_id,
+                        name: product.name, 
+                        price: product.price,
+                        image: product.image,
+                      });
                     }}
-                    className="w-10 h-10 rounded-xl bg-gold text-[#131313] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg"
+                    className="w-10 h-10 bg-gold text-[#131313] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all shadow-lg"
                   >
                     <ShoppingCart className="w-4 h-4" />
                   </button>

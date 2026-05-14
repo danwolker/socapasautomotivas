@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import logoImg from '../assets/Pelé das capas Logo (1).svg';
 
+import { Link } from 'react-router-dom';
+
 const Hero: React.FC = () => {
   const [index, setIndex] = useState(0);
   
@@ -78,9 +80,9 @@ const Hero: React.FC = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
-            <button className="btn-gold w-full sm:w-auto min-w-[240px]">
+            <Link to="/capas" className="btn-gold w-full sm:w-auto min-w-[240px] flex items-center justify-center">
               Ver Catálogo
-            </button>
+            </Link>
             <button className="btn-ghost w-full sm:w-auto min-w-[240px]">
               Saiba Mais
             </button>

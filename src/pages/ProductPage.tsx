@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../layouts/Layout';
 import { motion } from 'framer-motion';
-import { Check, Star, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { Check, Star, ChevronLeft, ChevronRight, Shield, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useParams } from 'react-router-dom';
+import { fetchProducts } from '../services/api';
 
 // All product images for the highlights carousel
 import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
@@ -17,15 +18,16 @@ import capaPersonalizadaImg from '../assets/capas/Capa Super Personalizada.png';
 import showroomImg from '../assets/capas/Capa para Showroom e Eventos.png';
 import carrosLongosImg from '../assets/capas/Capa para Picapes e Carros Longos.png';
 import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
+import windbannerImg from '../assets/capas/windbanner.png';
 
 const HIGHLIGHTS = [
-  { name: 'Capa para Carros Hatch', image: hatchImg, oldPrice: 449.90, price: 395.90, link: '/tradicional?type=Hatch' },
-  { name: 'Capa para SUVs', image: suvImg, oldPrice: 499.90, price: 449.90, link: '/tradicional?type=SUV' },
-  { name: 'Capa para Picapes e Carros Longos', image: carrosLongosImg, oldPrice: 550.00, price: 499.90, link: '/tradicional?type=Caminhonetes e Carros Longos' },
-  { name: 'Capa para Picapes Grandes', image: caminhoneteImg, oldPrice: 550.00, price: 479.90, link: '/tradicional?type=Caminhonete' },
-  { name: 'Capa para Carros Sedan', image: sedanImg, oldPrice: 469.90, price: 419.90, link: '/tradicional?type=Sedan' },
-  { name: 'Capa Premium Peluciada', image: premiumPeluciadaImg, oldPrice: 750.00, price: 670.00, link: '/peluciada?type=Sedan' },
-  { name: 'Capa para Jet Ski', image: jetSkiImg, oldPrice: 329.90, price: 285.90, link: '/tradicional?type=Jet Ski' },
+  { name: 'Capa para Carros Hatch', image: hatchImg, oldPrice: 449.90, price: 395.90, link: '/produto/linha-tradicional?type=Hatch' },
+  { name: 'Capa para SUVs', image: suvImg, oldPrice: 499.90, price: 449.90, link: '/produto/linha-tradicional?type=SUV' },
+  { name: 'Capa para Picapes e Carros Longos', image: carrosLongosImg, oldPrice: 550.00, price: 499.90, link: '/produto/linha-tradicional?type=Caminhonetes e Carros Longos' },
+  { name: 'Capa para Picapes Grandes', image: caminhoneteImg, oldPrice: 550.00, price: 479.90, link: '/produto/linha-tradicional?type=Caminhonete' },
+  { name: 'Capa para Carros Sedan', image: sedanImg, oldPrice: 469.90, price: 419.90, link: '/produto/linha-tradicional?type=Sedan' },
+  { name: 'Capa Premium Peluciada', image: premiumPeluciadaImg, oldPrice: 750.00, price: 670.00, link: '/produto/linha-premium-peluciada?type=Sedan' },
+  { name: 'Capa para Jet Ski', image: jetSkiImg, oldPrice: 329.90, price: 285.90, link: '/produto/linha-tradicional?type=Jet Ski' },
 ];
 
 const MOCK_REVIEWS = [
@@ -46,48 +48,30 @@ const StarRating: React.FC<{ rating: number; size?: string }> = ({ rating, size 
   </div>
 );
 
-interface ProductPageProps {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  features: string[];
-  specs: { label: string; value: string }[];
-  variations?: { type: string; price: number }[];
-  image?: string;
-}
+const IMAGE_MAP: Record<string, string> = {
+  'Hatch': hatchImg,
+  'Sedan': sedanImg,
+  'SUV': suvImg,
+  'Caminhonete': caminhoneteImg,
+  'Caminhonetes e Carros Longos': carrosLongosImg,
+  'Moto': motoImg,
+  'Jet Ski': jetSkiImg,
+  'Quadriciclo': quadricicloImg,
+  'Capa Personalizada': capaPersonalizadaImg,
+  'Showroom e Eventos': showroomImg,
+  'Windbanner': windbannerImg,
+};
 
-const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description, features, specs, variations, image }) => {
-  const { addToCart } = useCart();
+const ProductPage: React.FC = () => {
+  const { id } = useParams();
   const [searchParams] = useSearchParams();
   const preSelectedType = searchParams.get('type');
 
-  const [selectedVar, setSelectedVar] = useState(
-    variations?.find(v => v.type === preSelectedType) || (variations ? variations[0] : null)
-  );
+  const { addToCart } = useCart();
+  const [productData, setProductData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Update image dynamically if it's a vehicle variation
-  const getDynamicImage = () => {
-    if (id === 'tradicional' && selectedVar) {
-      switch (selectedVar.type) {
-        case 'Hatch': return hatchImg;
-        case 'Sedan': return sedanImg;
-        case 'SUV': return suvImg;
-        case 'Caminhonete': return caminhoneteImg;
-        case 'Caminhonetes e Carros Longos': return carrosLongosImg;
-        case 'Moto': return motoImg;
-        case 'Jet Ski': return jetSkiImg;
-        case 'Quadriciclo': return quadricicloImg;
-        case 'Capa Personalizada': return capaPersonalizadaImg;
-        case 'Showroom e Eventos': return showroomImg;
-        default: return image;
-      }
-    }
-    return image;
-  };
-
-  const currentImage = getDynamicImage();
-
+  const [selectedVar, setSelectedVar] = useState<any>(null);
   const [vehicleModel, setVehicleModel] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [highlightOffset, setHighlightOffset] = useState(0);
@@ -95,14 +79,59 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
   const [reviewRating, setReviewRating] = useState(5);
   const [showReviewForm, setShowReviewForm] = useState(false);
 
-  React.useEffect(() => {
-    if (preSelectedType && variations) {
-      const found = variations.find(v => v.type === preSelectedType);
-      if (found) setSelectedVar(found);
-    }
-  }, [preSelectedType, variations]);
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await fetchProducts();
+      const p = data.find((item: any) => item.slug === id);
+      if (p) {
+        setProductData(p);
+        const variation = p.variations?.find((v: any) => v.variation_name === preSelectedType) || p.variations?.[0];
+        setSelectedVar(variation);
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, [id, preSelectedType]);
 
-  const currentPrice = selectedVar ? selectedVar.price : price;
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-12 h-12 text-gold animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!productData) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <h1 className="text-white text-2xl font-black uppercase">Produto não encontrado</h1>
+        </div>
+      </Layout>
+    );
+  }
+
+  const currentPrice = selectedVar ? parseFloat(selectedVar.price) : 0;
+  
+  let currentImage = null;
+  if (selectedVar) {
+    currentImage = IMAGE_MAP[selectedVar.variation_name];
+  }
+
+  if (!currentImage) {
+    if (productData.category_slug === 'linha-premium-peluciada') {
+      currentImage = premiumPeluciadaImg;
+    } else if (productData.category_slug === 'acessorios') {
+      currentImage = windbannerImg;
+    } else {
+      currentImage = hatchImg; // fallback para tradicional
+    }
+  }
+
+  const isWindbanner = productData.category_slug === 'acessorios';
 
   // Highlight carousel: show 4 at a time
   const visibleHighlights = HIGHLIGHTS.slice(highlightOffset, highlightOffset + 4);
@@ -136,7 +165,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
                   {currentImage ? (
                     <img
                       src={currentImage}
-                      alt={name}
+                      alt={productData.name}
                       className="w-full h-full object-contain p-10 relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.9)]"
                     />
                   ) : (
@@ -156,9 +185,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               animate={{ opacity: 1, x: 0 }}
               className="lg:w-1/2 flex flex-col"
             >
-              <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Proteção Automotiva</span>
+              <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">{productData.category}</span>
               <h1 className="text-5xl md:text-6xl font-black text-white mb-6 uppercase tracking-tight">
-                {name} <span className="text-gold">{selectedVar?.type}</span>
+                {productData.name} <span className="text-gold">{selectedVar?.variation_name}</span>
               </h1>
 
               {/* Price */}
@@ -174,15 +203,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               {/* Selected Type Display (Static) */}
               {selectedVar && (
                 <div className="mb-8">
-                  <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Veículo Selecionado</h3>
+                  <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Opção Selecionada</h3>
                   <div className="inline-block px-6 py-3 bg-gold text-[#131313] font-black uppercase text-xs tracking-widest shadow-lg">
-                    {selectedVar.type}
+                    {selectedVar.variation_name}
                   </div>
                 </div>
               )}
 
               {/* Vehicle Model + Year (Only for Covers) */}
-              {id !== 'windbanner' && (
+              {!isWindbanner && (
                 <div className="mb-6">
                   <label className="block text-gold text-sm font-bold mb-2">Modelo e Ano do Veículo</label>
                   <input
@@ -196,7 +225,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               )}
 
               {/* Color Picker (Only for Covers) */}
-              {id !== 'windbanner' && (
+              {!isWindbanner && (
                 <div className="mb-8">
                   <label className="block text-gold text-sm font-bold mb-2">Escolha a cor da capa</label>
                   <div className="flex gap-3 items-center">
@@ -214,11 +243,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
                 </div>
               )}
 
-              <p className="text-text-main/50 text-base leading-relaxed mb-8 font-medium">{description}</p>
+              <p className="text-text-main/50 text-base leading-relaxed mb-8 font-medium">{productData.description}</p>
 
               {/* Feature badges */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-10">
-                {features.map((feature, i) => (
+                {productData.features?.map((feature: string, i: number) => (
                   <div key={i} className="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/5">
                     <div className="w-6 h-6 bg-gold/10 flex items-center justify-center shrink-0">
                       <Check className="w-3 h-3 text-gold" />
@@ -230,9 +259,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
 
               <button
                 onClick={() => addToCart({
-                  id: `${id}-${selectedVar?.type || 'default'}`,
-                  name: `${name} ${selectedVar?.type || ''} (${vehicleModel ? `${vehicleModel}` : 'Veículo não informado'}${selectedColor ? ` · ${selectedColor}` : ''})`,
+                  id: `${productData.slug}-${selectedVar?.id || 'default'}`,
+                  variation_id: selectedVar?.id,
+                  name: `${productData.name} ${selectedVar?.variation_name || ''}`.trim(),
                   price: currentPrice,
+                  image: currentImage || undefined,
+                  vehicle_model_year: (!isWindbanner && vehicleModel) ? vehicleModel : undefined,
+                  color: (!isWindbanner && selectedColor) ? selectedColor : undefined,
                 })}
                 className="w-full btn-gold py-6 text-base tracking-[0.2em] mb-10"
               >
@@ -242,10 +275,10 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               {/* Technical specs */}
               <div className="space-y-4 pt-8 border-t border-white/10">
                 <h3 className="font-black text-white uppercase tracking-widest text-sm mb-6">Especificações Técnicas</h3>
-                {specs.map((spec, i) => (
+                {productData.specs?.map((spec: any, i: number) => (
                   <div key={i} className="flex justify-between py-3 border-b border-white/5">
-                    <span className="text-text-main/40 font-bold uppercase text-xs tracking-wider">{spec.label}</span>
-                    <span className="text-text-main font-bold">{spec.value}</span>
+                    <span className="text-text-main/40 font-bold uppercase text-xs tracking-wider">{spec.spec_label}</span>
+                    <span className="text-text-main font-bold">{spec.spec_value}</span>
                   </div>
                 ))}
               </div>
@@ -262,24 +295,23 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               <div className="flex-1">
                 <h2 className="text-xl font-black text-white uppercase mb-6 tracking-tight">Características Gerais da Capa:</h2>
                 <ul className="space-y-2 text-text-main/70 text-sm leading-relaxed mb-8">
-                  {[
-                    'Tecido Importado feito de lycra com elastano;',
-                    'Tecido com 150gr (gramatura);',
-                    'Capa de tecido macio e gostoso, com encaixe perfeito no seu veículo;',
-                    'Protege de riscos e das mãos de curiosos;',
-                    'Lavável na máquina;',
-                    'Preserva a lataria e pintura do seu veículo evitando lavagens excessivas;',
-                    'Acompanha logo da montadora estampado;',
-                    'Acompanha bolsa/sacola para guardar;',
-                    'Possui encaixe de retrovisor;',
-                    'Elástico e costura reforçado',
-                    'Acompanha logomarca da montadora até 20cm',
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-gold mt-0.5">•</span>
-                      <span>{item}</span>
+                  {productData.general_features ? (
+                    productData.general_features.split('\n').filter((item: string) => item.trim() !== '').map((item: string, i: number) => {
+                      // Remove the bullet point if it exists at the start
+                      const cleanItem = item.replace(/^•\s*/, '').trim();
+                      if (!cleanItem) return null;
+                      return (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-gold mt-0.5">•</span>
+                          <span>{cleanItem}</span>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="flex items-start gap-2">
+                      <span>Nenhuma característica cadastrada.</span>
                     </li>
-                  ))}
+                  )}
                 </ul>
                 <p className="text-white font-bold text-sm mb-4">
                   **O tempo de fabricação do produto é em torno de 5 á 10 dias úteis.
