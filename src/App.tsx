@@ -184,11 +184,24 @@ function App() {
           } />
           <Route path="/acessorios/windbanner" element={
             <ProductPage
-              id="windbanner" name="Windbanner" price={179.90}
+              id="windbanner" 
+              name="Windbanner Personalizado" 
+              price={179.90}
               image={windbannerImg}
-              description="Windbanner personalizado para seu negócio ou evento. Alta visibilidade e durabilidade para uso externo."
-              features={['Alta Durabilidade', 'Uso Externo', 'Personalizado', 'Fácil Montagem']}
-              specs={[{ label: 'Material', value: 'Poliéster' }, { label: 'Uso', value: 'Externo' }]}
+              description="Destaque sua marca com visibilidade total! O Windbanner da Pelé das Capas é produzido com materiais de alta performance, garantindo resistência ao vento e cores vibrantes que não desbotam ao sol. Ideal para calçadas, entradas de lojas e eventos ao ar livre."
+              features={[
+                'Impressão em Alta Resolução', 
+                'Tecido Flag de Qualidade', 
+                'Haste de Fibra de Vidro', 
+                'Base de Alta Estabilidade',
+                'Fácil de Transportar e Montar'
+              ]}
+              specs={[
+                { label: 'Material', value: 'Poliéster 110g' }, 
+                { label: 'Estrutura', value: 'Fibra e Alumínio' },
+                { label: 'Resistência', value: 'Ventos até 40km/h' },
+                { label: 'Personalização', value: 'Frente e Verso' }
+              ]}
             />
           } />
         </Routes>

@@ -61,6 +61,29 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
   const [selectedVar, setSelectedVar] = useState(
     variations?.find(v => v.type === preSelectedType) || (variations ? variations[0] : null)
   );
+
+  // Update image dynamically if it's a vehicle variation
+  const getDynamicImage = () => {
+    if (id === 'tradicional' && selectedVar) {
+      switch (selectedVar.type) {
+        case 'Hatch': return hatchImg;
+        case 'Sedan': return sedanImg;
+        case 'SUV': return suvImg;
+        case 'Caminhonete': return caminhoneteImg;
+        case 'Caminhonetes e Carros Longos': return carrosLongosImg;
+        case 'Moto': return motoImg;
+        case 'Jet Ski': return jetSkiImg;
+        case 'Quadriciclo': return quadricicloImg;
+        case 'Capa Personalizada': return capaPersonalizadaImg;
+        case 'Showroom e Eventos': return showroomImg;
+        default: return image;
+      }
+    }
+    return image;
+  };
+
+  const currentImage = getDynamicImage();
+
   const [vehicleModel, setVehicleModel] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [highlightOffset, setHighlightOffset] = useState(0);
@@ -106,9 +129,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-2/3 h-2/3 bg-gold/10 rounded-full blur-[100px]"></div>
                   </div>
-                  {image ? (
+                  {currentImage ? (
                     <img
-                      src={image}
+                      src={currentImage}
                       alt={name}
                       className="w-full h-full object-contain p-10 relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.9)]"
                     />
@@ -130,7 +153,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               className="lg:w-1/2 flex flex-col"
             >
               <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Proteção Automotiva</span>
-              <h1 className="text-5xl md:text-6xl font-black text-white mb-6 uppercase tracking-tight">{name}</h1>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-6 uppercase tracking-tight">
+                {name} <span className="text-gold">{selectedVar?.type}</span>
+              </h1>
 
               {/* Price */}
               <div className="flex items-center gap-6 mb-8 pt-6 border-t border-white/5">
@@ -142,56 +167,48 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
                 </div>
               </div>
 
-              {/* Variations */}
-              {variations && (
+              {/* Selected Type Display (Static) */}
+              {selectedVar && (
                 <div className="mb-8">
-                  <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Selecione seu Veículo</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
-                    {variations.map((v) => (
-                      <button
-                        key={v.type}
-                        onClick={() => setSelectedVar(v)}
-                        className={`px-4 py-3 border text-[10px] font-black uppercase tracking-widest transition-all ${
-                          selectedVar?.type === v.type
-                            ? 'bg-gold text-[#131313] border-gold'
-                            : 'bg-white/5 border-white/10 text-white/40 hover:border-white/30'
-                        }`}
-                      >
-                        {v.type}
-                      </button>
-                    ))}
+                  <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Veículo Selecionado</h3>
+                  <div className="inline-block px-6 py-3 bg-gold text-[#131313] font-black uppercase text-xs tracking-widest shadow-lg">
+                    {selectedVar.type}
                   </div>
                 </div>
               )}
 
-              {/* Vehicle Model + Year */}
-              <div className="mb-6">
-                <label className="block text-gold text-sm font-bold mb-2">Modelo e Ano do Veículo</label>
-                <input
-                  type="text"
-                  value={vehicleModel}
-                  onChange={(e) => setVehicleModel(e.target.value)}
-                  placeholder="Digite Modelo e ano do veículo"
-                  className="w-full bg-white/5 border border-white/15 px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-gold/60 transition-colors"
-                />
-              </div>
-
-              {/* Color Picker */}
-              <div className="mb-8">
-                <label className="block text-gold text-sm font-bold mb-2">Escolha a cor da capa</label>
-                <div className="flex gap-3 items-center">
-                  <span className="text-white/50 text-sm font-bold min-w-[3rem]">Cor</span>
-                  <select
-                    value={selectedColor}
-                    onChange={(e) => setSelectedColor(e.target.value)}
-                    className="flex-1 bg-[#1a1a1a] border border-white/15 px-4 py-3 text-white focus:outline-none focus:border-gold/60 transition-colors appearance-none cursor-pointer"
-                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff60' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
-                  >
-                    <option value="" disabled>Escolha uma opção</option>
-                    {CORES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
+              {/* Vehicle Model + Year (Only for Covers) */}
+              {id !== 'windbanner' && (
+                <div className="mb-6">
+                  <label className="block text-gold text-sm font-bold mb-2">Modelo e Ano do Veículo</label>
+                  <input
+                    type="text"
+                    value={vehicleModel}
+                    onChange={(e) => setVehicleModel(e.target.value)}
+                    placeholder="Digite Modelo e ano do veículo"
+                    className="w-full bg-white/5 border border-white/15 px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-gold/60 transition-colors"
+                  />
                 </div>
-              </div>
+              )}
+
+              {/* Color Picker (Only for Covers) */}
+              {id !== 'windbanner' && (
+                <div className="mb-8">
+                  <label className="block text-gold text-sm font-bold mb-2">Escolha a cor da capa</label>
+                  <div className="flex gap-3 items-center">
+                    <span className="text-white/50 text-sm font-bold min-w-[3rem]">Cor</span>
+                    <select
+                      value={selectedColor}
+                      onChange={(e) => setSelectedColor(e.target.value)}
+                      className="flex-1 bg-[#1a1a1a] border border-white/15 px-4 py-3 text-white focus:outline-none focus:border-gold/60 transition-colors appearance-none cursor-pointer"
+                      style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff60' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+                    >
+                      <option value="" disabled>Escolha uma opção</option>
+                      {CORES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               <p className="text-text-main/50 text-base leading-relaxed mb-8 font-medium">{description}</p>
 
@@ -210,7 +227,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ id, name, price, description,
               <button
                 onClick={() => addToCart({
                   id: `${id}-${selectedVar?.type || 'default'}`,
-                  name: `${name} (${selectedVar?.type || 'Padrão'}${selectedColor ? ` · ${selectedColor}` : ''})`,
+                  name: `${name} ${selectedVar?.type || ''} (${vehicleModel ? `${vehicleModel}` : 'Veículo não informado'}${selectedColor ? ` · ${selectedColor}` : ''})`,
                   price: currentPrice,
                 })}
                 className="w-full btn-gold py-6 text-base tracking-[0.2em] mb-10"
