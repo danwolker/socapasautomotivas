@@ -26,11 +26,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
                 });
             } else {
                 videoRef.current.pause();
-                videoRef.current.currentTime = 0;
+                videoRef.current.currentTime = 0.5;
             }
         }
     }, [isHovered]);
 
+    // Show a frame when video metadata is ready (instead of black screen)
+    const handleLoadedMetadata = () => {
+        if (videoRef.current && !isHovered) {
+            videoRef.current.currentTime = 0.5;
+        }
+    };
     // Construct the correct URL
     const baseUrl = import.meta.env.BASE_URL || '/';
     // Ensure the URL is correctly formed and encoded
@@ -50,12 +56,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
             {/* Video Element */}
             <video 
                 ref={videoRef}
-                key={videoUrl} // Force re-render if URL changes
+                key={videoUrl}
                 className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500"
                 muted={isMuted}
                 loop
                 playsInline
                 preload="auto"
+                crossOrigin="anonymous"
+                onLoadedMetadata={handleLoadedMetadata}
             >
                 <source src={videoUrl} type="video/mp4" />
                 Seu navegador não suporta vídeos.
