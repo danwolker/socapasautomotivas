@@ -27,9 +27,25 @@ const Cart: React.FC = () => {
 
   const [shippingCost, setShippingCost] = useState(0);
 
+  const maskPhone = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
+  };
+
+  const maskCEP = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{3})\d+?$/, '$1');
+  };
+
   const handleCepLookup = async (cep: string) => {
-    const cleanCep = cep.replace(/\D/g, '');
-    setCustomer(prev => ({ ...prev, cep: cleanCep }));
+    const masked = maskCEP(cep);
+    const cleanCep = masked.replace(/\D/g, '');
+    setCustomer(prev => ({ ...prev, cep: masked }));
 
     if (cleanCep.length === 8) {
       try {
@@ -192,7 +208,7 @@ const Cart: React.FC = () => {
                         value={customer.email} onChange={e => setCustomer({...customer, email: e.target.value})} />
                       <input type="tel" placeholder="WhatsApp"
                         className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
-                        value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
+                        value={customer.phone} onChange={e => setCustomer({...customer, phone: maskPhone(e.target.value)})} />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
