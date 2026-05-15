@@ -15,8 +15,48 @@ const Cart: React.FC = () => {
   const [customer, setCustomer] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    cep: '',
+    address: '',
+    number: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
+    state: ''
   });
+
+  const [shippingCost, setShippingCost] = useState(0);
+
+  const handleCepLookup = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, '');
+    setCustomer(prev => ({ ...prev, cep: cleanCep }));
+
+    if (cleanCep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          setCustomer(prev => ({
+            ...prev,
+            address: data.logradouro,
+            neighborhood: data.bairro,
+            city: data.localidade,
+            state: data.uf
+          }));
+
+          // Mock shipping calculation based on state
+          const stateFreight: { [key: string]: number } = {
+            'SP': 25.00, 'RJ': 35.00, 'MG': 35.00, 'ES': 40.00,
+            'PR': 45.00, 'SC': 45.00, 'RS': 50.00,
+            'MT': 60.00, 'MS': 60.00, 'GO': 55.00, 'DF': 55.00,
+          };
+          setShippingCost(stateFreight[data.uf] || 70.00);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +68,17 @@ const Cart: React.FC = () => {
       customer_name: customer.name,
       customer_email: customer.email,
       customer_phone: customer.phone,
+      cep: customer.cep,
+      address: customer.address,
+      number: customer.number,
+      complement: customer.complement,
+      neighborhood: customer.neighborhood,
+      city: customer.city,
+      state: customer.state,
+      shipping_amount: shippingCost,
       payment_method: 'A combinar',
       items: cart.map(item => ({
-        variation_id: item.variation_id,   // ID numérico real do banco
+        variation_id: item.variation_id,
         quantity: item.quantity,
         vehicle_model_year: item.vehicle_model_year || '',
         color: item.color || '',
@@ -60,7 +108,7 @@ const Cart: React.FC = () => {
               <p className="text-gold font-black text-lg mb-4">Pedido #{String(orderId).padStart(4, '0')}</p>
             )}
             <p className="text-text-main/50 font-medium mb-8">
-              Recebemos seu pedido com sucesso. Nossa equipe entrará em contato em breve para combinar os detalhes.
+              Recebemos seu pedido com sucesso. Nossa equipe entrará em contato em breve para combinar os detalhes e confirmar o frete.
             </p>
             <Link to="/" className="btn-gold px-12 inline-block">
               VOLTAR À LOJA
@@ -137,12 +185,40 @@ const Cart: React.FC = () => {
                     <input type="text" required placeholder="Nome Completo"
                       className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
                       value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
-                    <input type="email" required placeholder="E-mail"
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <input type="email" required placeholder="E-mail"
+                        className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.email} onChange={e => setCustomer({...customer, email: e.target.value})} />
+                      <input type="tel" placeholder="WhatsApp"
+                        className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <input type="text" required placeholder="CEP" maxLength={9}
+                        className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.cep} onChange={e => handleCepLookup(e.target.value)} />
+                      <input type="text" required placeholder="Nº"
+                        className="col-span-1 w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.number} onChange={e => setCustomer({...customer, number: e.target.value})} />
+                      <input type="text" placeholder="Compl."
+                        className="col-span-1 w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.complement} onChange={e => setCustomer({...customer, complement: e.target.value})} />
+                    </div>
+
+                    <input type="text" required placeholder="Endereço"
                       className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
-                      value={customer.email} onChange={e => setCustomer({...customer, email: e.target.value})} />
-                    <input type="tel" placeholder="WhatsApp (opcional)"
-                      className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
-                      value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
+                      value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <input type="text" required placeholder="Bairro"
+                        className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.neighborhood} onChange={e => setCustomer({...customer, neighborhood: e.target.value})} />
+                      <input type="text" required placeholder="Cidade/UF"
+                        className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-gold focus:outline-none transition-colors"
+                        value={customer.city + (customer.state ? ` / ${customer.state}` : '')} readOnly />
+                    </div>
                   </div>
 
                   <h2 className="text-xl font-black text-white uppercase tracking-widest mb-6">Resumo</h2>
@@ -152,13 +228,15 @@ const Cart: React.FC = () => {
                       <span className="text-white font-bold">{totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-text-main/40 font-bold uppercase text-xs">Frete</span>
-                      <span className="text-green-400 font-bold uppercase text-xs">Grátis</span>
+                      <span className="text-text-main/40 font-bold uppercase text-xs">Frete Estimado</span>
+                      <span className={shippingCost === 0 ? "text-green-400 font-bold uppercase text-xs" : "text-white font-bold text-xs"}>
+                        {shippingCost === 0 ? "Grátis" : shippingCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </span>
                     </div>
                     <div className="h-px bg-white/10 my-4"></div>
                     <div className="flex justify-between items-end">
                       <span className="text-text-main/40 font-black uppercase text-xs">Total</span>
-                      <span className="text-3xl font-black text-white">{totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                      <span className="text-3xl font-black text-white">{(totalPrice + shippingCost).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
                   </div>
 
