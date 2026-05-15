@@ -8,6 +8,7 @@ import Covers from './pages/Covers';
 import LegalPage from './pages/LegalPage';
 
 import ScrollToTop from './components/ScrollToTop';
+import FloatingContact from './components/FloatingContact';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
           <Route path="/produto/:id" element={<ProductPage />} />
 
         </Routes>
+        <FloatingContact />
       </Router>
     </CartProvider>
   );
