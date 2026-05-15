@@ -258,15 +258,28 @@ const ProductPage: React.FC = () => {
               </div>
 
               <button
-                onClick={() => addToCart({
-                  id: `${productData.slug}-${selectedVar?.id || 'default'}`,
-                  variation_id: selectedVar?.id,
-                  name: `${productData.name} ${selectedVar?.variation_name || ''}`.trim(),
-                  price: currentPrice,
-                  image: currentImage || undefined,
-                  vehicle_model_year: (!isWindbanner && vehicleModel) ? vehicleModel : undefined,
-                  color: (!isWindbanner && selectedColor) ? selectedColor : undefined,
-                })}
+                onClick={() => {
+                  if (!isWindbanner) {
+                    if (!vehicleModel.trim()) {
+                      alert("Por favor, preencha o Modelo e Ano do veículo.");
+                      return;
+                    }
+                    if (!selectedColor) {
+                      alert("Por favor, escolha a cor da capa.");
+                      return;
+                    }
+                  }
+                  
+                  addToCart({
+                    id: `${productData.slug}-${selectedVar?.id || 'default'}`,
+                    variation_id: selectedVar?.id,
+                    name: `${productData.name} ${selectedVar?.variation_name || ''}`.trim(),
+                    price: currentPrice,
+                    image: currentImage || undefined,
+                    vehicle_model_year: (!isWindbanner && vehicleModel) ? vehicleModel : undefined,
+                    color: (!isWindbanner && selectedColor) ? selectedColor : undefined,
+                  });
+                }}
                 className="w-full btn-gold py-6 text-base tracking-[0.2em] mb-10"
               >
                 ADICIONAR AO CARRINHO

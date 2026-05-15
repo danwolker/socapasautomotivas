@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, ChevronRight, Loader2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
 import { fetchProducts } from '../services/api';
 
 import hatchImg from '../assets/capas/Capa para Carros Hatch.png';
@@ -11,7 +10,6 @@ import premiumPeluciadaImg from '../assets/capas/Capa Premium Peluciada.png';
 import windbannerImg from '../assets/capas/windbanner.png';
 
 const Bestsellers: React.FC = () => {
-  const { addToCart } = useCart();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -119,21 +117,12 @@ const Bestsellers: React.FC = () => {
                     {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </p>
                 </div>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    addToCart({ 
-                      id: `best-${product.variation_id}`,
-                      variation_id: product.variation_id,
-                      name: `${product.name} - ${product.type}`, 
-                      price: product.price,
-                      image: product.image,
-                    });
-                  }}
+                <Link
+                  to={`/produto/${product.productId}?type=${product.type}`}
                   className="w-12 h-12 bg-gold text-[#131313] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all shadow-lg"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                </button>
+                </Link>
               </div>
             </motion.div>
           ))}

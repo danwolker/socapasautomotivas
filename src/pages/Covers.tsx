@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../layouts/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Loader2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { fetchProducts } from '../services/api';
 
@@ -37,7 +36,6 @@ const Covers: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
 
   useEffect(() => {
     const loadData = async () => {
@@ -154,21 +152,12 @@ const Covers: React.FC = () => {
                       <p className="text-xl font-black text-white tracking-tighter">
                         {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                       </p>
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart({ 
-                            id: `cover-${product.variation_id}`,
-                            variation_id: product.variation_id,
-                            name: `${data[activeTab].name} - ${product.type}`, 
-                            price: product.price,
-                            image: product.image,
-                          });
-                        }}
+                      <Link 
+                        to={`/produto/${product.id}?type=${product.type}`}
                         className="w-10 h-10 bg-gold text-[#131313] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all"
                       >
                         <ShoppingCart className="w-4 h-4" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
