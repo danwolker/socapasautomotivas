@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Volume2, VolumeX } from 'lucide-react';
 import { fetchVideos } from '../services/api';
@@ -15,28 +15,39 @@ interface VideoCardProps {
 
 const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(true);
 
-    useEffect(() => {
+    const play = () => {
         if (videoRef.current) {
-            if (isHovered) {
-                videoRef.current.play().catch((err) => {
-                    console.warn("Playback failed:", err);
-                });
-            } else {
-                videoRef.current.pause();
-                videoRef.current.currentTime = 0.5;
-            }
+            videoRef.current.play().catch((err) => console.warn("Playback failed:", err));
+            setIsPlaying(true);
         }
-    }, [isHovered]);
+    };
+
+    const pause = () => {
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0.5;
+            setIsPlaying(false);
+        }
+    };
+
+    const handleClick = () => {
+        if (isPlaying) {
+            setIsMuted(prev => !prev);
+        } else {
+            play();
+        }
+    };
 
     // Show a frame when video metadata is ready (instead of black screen)
     const handleLoadedMetadata = () => {
-        if (videoRef.current && !isHovered) {
+        if (videoRef.current) {
             videoRef.current.currentTime = 0.5;
         }
     };
+
     // Construct the correct URL
     const baseUrl = import.meta.env.BASE_URL || '/';
     // Ensure the URL is correctly formed and encoded
@@ -49,9 +60,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
             transition={{ delay: index * 0.1 }}
             viewport={{ once: true }}
             className="group relative aspect-[9/16] rounded-[32px] overflow-hidden border border-white/10 bg-white/5 cursor-pointer shadow-premium"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => setIsMuted(!isMuted)}
+            onMouseEnter={play}
+            onMouseLeave={pause}
+            onClick={handleClick}
         >
             {/* Video Element */}
             <video 
@@ -79,8 +90,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
                 </div>
             </div>
 
-            {/* Play Button Icon (visible when not hovered) */}
-            {!isHovered && (
+            {/* Play Button Icon (visible when not playing) */}
+            {!isPlaying && (
                 <div className="absolute inset-0 flex items-center justify-center z-20">
                     <div className="w-16 h-16 rounded-full bg-gold text-white flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
                         <Play className="w-6 h-6 fill-current ml-1" />
