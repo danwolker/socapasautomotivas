@@ -7,10 +7,13 @@ import Accessories from './pages/Accessories';
 import Covers from './pages/Covers';
 import LegalPage from './pages/LegalPage';
 
+import ScrollToTop from './components/ScrollToTop';
+
 function App() {
   return (
     <CartProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
