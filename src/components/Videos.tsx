@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Volume2, VolumeX } from 'lucide-react';
 import { fetchVideos } from '../services/api';
@@ -50,8 +50,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
 
     // Construct the correct URL
     const baseUrl = import.meta.env.BASE_URL || '/';
-    // Ensure the URL is correctly formed and encoded
-    const videoUrl = `${baseUrl}movies/${tip.video_path}`.replace(/\/+/g, '/');
+    // Ensure the URL is correctly formed and encoded (cache buster added to fix poisoned browser cache)
+    const videoUrl = `${baseUrl}movies/${tip.video_path}?v=1`.replace(/\/+/g, '/').replace('http:/', 'http://').replace('https:/', 'https://');
 
     return (
         <motion.div
@@ -73,7 +73,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ tip, index }) => {
                 loop
                 playsInline
                 preload="auto"
-                crossOrigin="anonymous"
                 onLoadedMetadata={handleLoadedMetadata}
             >
                 <source src={videoUrl} type="video/mp4" />
